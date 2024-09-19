@@ -1,0 +1,3 @@
+[submodule "web/super-backend"]
+	path = web/super-backend
+	url = http://github.com/mateusdias/super-backend
