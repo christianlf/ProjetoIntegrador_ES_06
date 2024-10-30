@@ -1,0 +1,30 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "oracle"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  status     Boolean
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+}
+
+model Evento {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descricao   String
+  precoPorCota Float
+  dataInicio  DateTime
+  dataFim     DateTime
+  dataEvento  DateTime
+}
