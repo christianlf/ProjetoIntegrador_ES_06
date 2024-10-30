@@ -1,37 +1,24 @@
-import express from "express";
-import { Request, Response, Router } from "express";
-import { AccountsHandler } from "./rotas/routes";
-import { FinancialManager } from "./financial/financial";
-import { EventsHandler } from "./eventos/eventos";
+// src/index.ts
+import Fastify from 'fastify';
+import cors from '@fastify/cors'
+import fastify from 'fastify';
+import { routes } from './routes';
 
-const port = 3000; 
-const server = express();
-const routes = Router();
 
-// Middleware para analisar o corpo da requisição
-server.use(express.json()); // Para lidar com JSON no corpo da requisição
+const app = fastify({ logger: true })
 
-// Definir as rotas
-routes.get('/', (req: Request, res: Response) => {
-    res.status(403).send('Acesso não permitido.');
-});
+app.setErrorHandler((error, request ,reply)=>
+   reply.code(400).send({message: error.message})
 
-// Rota para login
-routes.post('/login', AccountsHandler.loginHandler);
-routes.put('/signup', AccountsHandler.signUpHandler);
-routes.get('/getWallet', FinancialManager.getWalletHandler);
-routes.put('/addEvent', EventsHandler.addNewEventsHandler);
-routes.post('/deleteEvent', EventsHandler.deleteEventHandler);
-routes.post('/addFunds', FinancialManager.addFundsHandler);
-routes.post('/withdrawFunds', FinancialManager.withdrawFundsHandler);
-routes.post('/evaluateEvent', EventsHandler.evaluateEventHandler);
-routes.get('/searchEvents', EventsHandler.searchEventsHandler);
-routes.get('/getEvents', EventsHandler.getEventsHandler);
-routes.put('/betOnEvent', EventsHandler.betOnEventsHandler);
+)
 
-server.use(routes);
-
-// Iniciar o servidor
-server.listen(port, () => {
-    console.log(`Server is running on: ${port}`);
-});
+const start = async () => {
+  await app.register(cors);
+  await app.register(routes);
+  try {
+    await app.listen({ port: 3333 })
+  } catch (err) {
+    process.exit(1)
+  }
+}
+start();
