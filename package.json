@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
-    "@types/express": "^5.0.0"
+    "@types/express": "^5.0.0",
+    "@types/oracledb": "^6.5.2"
   }
 }
