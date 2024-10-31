@@ -1,7 +1,7 @@
 import express from "express";
 import { Request, Response, Router } from "express";
 import { AccountsHandler } from "./accounts/accounts";
-import { FinancialManager } from "./financial/financial";
+import { FinancialManager } from "./src/financial/financial";
 import { EventsHandler } from "./events/events";
 
 const port = 3001; 

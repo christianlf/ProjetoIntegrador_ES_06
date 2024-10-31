@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from "express";
-import { FinancialManager } from "../financial/financial";
+import { FinancialManager } from "../src/financial/financial";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv';
 
