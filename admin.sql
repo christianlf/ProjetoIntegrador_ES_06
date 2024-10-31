@@ -21,10 +21,10 @@ INSERT INTO ACCOUNTS
 VALUES
     (
         SEQ_ACCOUNTS.NEXTVAL,
-        'Felipe Corso Pretoni',
-        'felipepretoni@gmail.com',
-        '123felipe',
-        '05/01/2006',
+        'Christian Lindoso',
+        'chlindoso@gmail.com',
+        '123ch',
+        '04/09/2021',
         'ADMIN',
         0
 );
@@ -65,11 +65,11 @@ INSERT INTO EVENTS
 VALUES
     (
         SEQ_EVENTS.NEXTVAL,
-        'Evento de Teste',
-        'Evento de teste para a aplicação',
-        '01/01/2021',
-        '01/01/2021',
-        'Pendente',
+        'teste',
+        'teste',
+        '05/01/2022',
+        '08/06/2024',
+        'Concluido',
         '1'
 );
 commit;
@@ -102,9 +102,9 @@ INSERT INTO BETS
 VALUES
     (
         SEQ_BETS.NEXTVAL,
-        100,
-        'SIM',
-        'Mu0',
+        200,
+        'Não',
+        'Sim',
         1
 );
 
