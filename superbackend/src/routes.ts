@@ -9,6 +9,8 @@ import { LoginRequestBody } from './types'; // Importando o tipo
 // src/controller/CreateEventController.ts
 import { CreateEventRequestBody } from './types'; // Ajuste o caminho se necessário
 
+const routes = Router();
+
 export async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     // Rota de teste
     fastify.get("/teste", async (request, reply) => {
@@ -20,19 +22,16 @@ export async function routes(fastify: FastifyInstance, options: FastifyPluginOpt
     fastify.post('/login', async (request: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) => {
         return loginController.handle(request, reply);
     });
-
     // Rota para cadastrar um cliente
     const createCustomerController = new CreateCustomerController();
     fastify.post("/cadastrar", async (request, reply) => {
         return createCustomerController.handle(request, reply);
     });
-
     // Rota para listar clientes
     const listCustomerController = new ListCustomerController();
     fastify.get("/listar", async (request, reply) => {
         return listCustomerController.handle(request, reply);
     });
-
     // Rota para deletar um cliente
     const deleteCustomerController = new DeleteCustomerController();
     fastify.delete("/deletar", async (request, reply) => {
@@ -43,4 +42,20 @@ export async function routes(fastify: FastifyInstance, options: FastifyPluginOpt
     fastify.post("/criar-evento", async (request: FastifyRequest<{ Body: CreateEventRequestBody }>, reply: FastifyReply) => {
         return createEventController.handle(request, reply);
     });
+    // Rota para login
+    fastify.post('/login', LoginController);
+
+
+
+    routes.put('/signup', AccountsHandler.signUpHandler);
+    routes.get('/getWallet', FinancialManager.getWalletHandler);
+    routes.put('/addEvent', EventsHandler.addNewEventsHandler);
+    routes.post('/deleteEvent', EventsHandler.deleteEventHandler);
+    routes.post('/addFunds', FinancialManager.addFundsHandler);
+    routes.post('/withdrawFunds', FinancialManager.withdrawFundsHandler);
+    routes.post('/evaluateEvent', EventsHandler.evaluateEventHandler);
+    routes.get('/searchEvents', EventsHandler.searchEventsHandler);
+    routes.get('/getEvents', EventsHandler.getEventsHandler);
+    routes.put('/betOnEvent', EventsHandler.betOnEventsHandler);
+    routes.post('/finishEvent', EventsHandler.finishEventHandler);
 }

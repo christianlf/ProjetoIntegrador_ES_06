@@ -1,26 +1,29 @@
-DROP TABLE ACCOUNTS;
-DROP SEQUENCE SEQ_ACCOUNTS;
+-- Removendo as tabelas e sequências existentes, caso elas já existam
+DROP TABLE CONTAS;
+DROP SEQUENCE SEQ_CONTAS;
 
-CREATE TABLE ACCOUNTS
+-- Criando a tabela CONTAS
+CREATE TABLE CONTAS
 (
     id INT PRIMARY KEY,
-    complete_name VARCHAR(100) NOT NULL,
+    nome_completo VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    birthday_date VARCHAR(10) NOT NULL,
-    user_type VARCHAR(9),
-    balance DECIMAL,
+    senha VARCHAR(255) NOT NULL,
+    data_nascimento VARCHAR(10) NOT NULL,
+    tipo_usuario VARCHAR(9),
+    saldo DECIMAL,
     token VARCHAR2(10)
 );
 
-CREATE SEQUENCE SEQ_ACCOUNTS START WITH 1 INCREMENT BY 1;
+-- Criando a sequência para IDs de CONTAS
+CREATE SEQUENCE SEQ_CONTAS START WITH 1 INCREMENT BY 1;
 
-INSERT INTO ACCOUNTS
-    (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDAY_DATE, USER_TYPE, BALANCE
-    )
+-- Inserindo dados na tabela CONTAS
+INSERT INTO CONTAS
+    (ID, NOME_COMPLETO, EMAIL, SENHA, DATA_NASCIMENTO, TIPO_USUARIO, SALDO)
 VALUES
     (
-        SEQ_ACCOUNTS.NEXTVAL,
+        SEQ_CONTAS.NEXTVAL,
         'Christian Lindoso',
         'chlindoso@gmail.com',
         '123ch',
@@ -29,84 +32,91 @@ VALUES
         0
 );
 
-commit;
+COMMIT;
 
-DROP TABLE EVENTS;
-DROP SEQUENCE SEQ_EVENTS;
+-- Removendo as tabelas e sequências existentes, caso elas já existam
+DROP TABLE EVENTOS;
+DROP SEQUENCE SEQ_EVENTOS;
 
-CREATE TABLE EVENTS
+-- Criando a tabela EVENTOS
+CREATE TABLE EVENTOS
 (
-    event_id INT PRIMARY KEY,
-    event_title VARCHAR(50),
-    event_description VARCHAR(150),
-    eventStartDate VARCHAR(10),
-    eventFinalDate VARCHAR(10),
-    event_status VARCHAR(20),
-    verdict VARCHAR(3),
-    amount_wins DECIMAL,
-    amount_loses DECIMAL,
-    FK_ACCOUNT_ID INT,
-    FOREIGN KEY (FK_ACCOUNT_ID) REFERENCES ACCOUNTS(ID)
+    evento_id INT PRIMARY KEY,
+    titulo_evento VARCHAR(50),
+    descricao_evento VARCHAR(150),
+    data_inicio_evento VARCHAR(10),
+    data_final_evento VARCHAR(10),
+    status_evento VARCHAR(20),
+    veredito VARCHAR(3),
+    valor_vitorias DECIMAL,
+    valor_derrotas DECIMAL,
+    fk_id_conta INT,
+    FOREIGN KEY (fk_id_conta) REFERENCES CONTAS(id)
 );
 
-CREATE SEQUENCE SEQ_EVENTS START WITH 1 INCREMENT BY 1;
+-- Criando a sequência para IDs de EVENTOS
+CREATE SEQUENCE SEQ_EVENTOS START WITH 1 INCREMENT BY 1;
 
-INSERT INTO EVENTS
+-- Inserindo dados na tabela EVENTOS
+INSERT INTO EVENTOS
     (
-    event_id,
-    event_title,
-    event_description,
-    eventStartDate,
-    eventFinalDate,
-    event_status,
-    FK_ACCOUNT_ID
-
+    evento_id,
+    titulo_evento,
+    descricao_evento,
+    data_inicio_evento,
+    data_final_evento,
+    status_evento,
+    fk_id_conta
     )
 VALUES
     (
-        SEQ_EVENTS.NEXTVAL,
+        SEQ_EVENTOS.NEXTVAL,
         'teste',
         'teste',
         '05/01/2022',
         '08/06/2024',
         'Concluido',
-        '1'
-);
-commit;
-
-DROP TABLE BETS;
-DROP SEQUENCE SEQ_BETS;
-
-CREATE SEQUENCE SEQ_BETS START WITH 1 INCREMENT BY 1;
-
-CREATE TABLE BETS
-(
-    bet_id INT PRIMARY KEY,
-    bet_value DECIMAL ,
-    bet_option VARCHAR(10) NOT NULL,
-    FK_ACCOUNT_EMAIL VARCHAR2(100) NOT NULL,
-    FK_EVENT_ID INT NOT NULL,
-    user_proportion DECIMAL,
-    FOREIGN KEY (FK_ACCOUNT_EMAIL) REFERENCES ACCOUNTS(email),
-    FOREIGN KEY (FK_EVENT_ID) REFERENCES EVENTS(event_id)
-);
-
-INSERT INTO BETS
-    (
-    bet_id,
-    bet_value,
-    bet_option,
-    FK_ACCOUNT_EMAIL,
-    FK_EVENT_ID
-    )
-VALUES
-    (
-        SEQ_BETS.NEXTVAL,
-        200,
-        'Não',
-        'Sim',
         1
 );
 
-commit;
-    
+COMMIT;
+
+-- Removendo as tabelas e sequências existentes, caso elas já existam
+DROP TABLE APOSTAS;
+DROP SEQUENCE SEQ_APOSTAS;
+
+-- Criando a sequência para IDs de APOSTAS
+CREATE SEQUENCE SEQ_APOSTAS START WITH 1 INCREMENT BY 1;
+
+-- Criando a tabela APOSTAS
+CREATE TABLE APOSTAS
+(
+    aposta_id INT PRIMARY KEY,
+    valor_aposta DECIMAL,
+    opcao_aposta VARCHAR(10) NOT NULL,
+    fk_email_conta VARCHAR2(100) NOT NULL,
+    fk_id_evento INT NOT NULL,
+    proporcao_usuario DECIMAL,
+    FOREIGN KEY (fk_email_conta) REFERENCES CONTAS(email),
+    FOREIGN KEY (fk_id_evento) REFERENCES EVENTOS(evento_id)
+);
+
+-- Inserindo dados na tabela APOSTAS
+INSERT INTO APOSTAS
+    (
+    aposta_id,
+    valor_aposta,
+    opcao_aposta,
+    fk_email_conta,
+    fk_id_evento
+    )
+VALUES
+    (
+        SEQ_APOSTAS.NEXTVAL,
+        200,
+        'Não',
+        'chlindoso@gmail.com',
+        1
+);
+
+COMMIT;

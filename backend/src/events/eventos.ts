@@ -1,13 +1,12 @@
 import { Request, RequestHandler, Response } from "express";
-import { FinancialManager } from "../src/financial/financial";
+import { Obtercarteira } from "../financial/Obtercarteira";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv';
-
 dotenv.config();
 
-export namespace EventsHandler {
+export namespace ManipuladorDeEventos {
 
-    async function addNewEvent(eventTitle: string, eventDescription: string, eventStart: string, eventFinal: string, FK_ACCOUNT_ID: number) {
+    async function adicionarNovoEvento(tituloEvento: string, descricaoEvento: string, dataInicioEvento: string, dataFinalEvento: string, fkIdConta: number) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -17,29 +16,29 @@ export namespace EventsHandler {
         });
 
         await connection.execute(
-            `INSERT INTO EVENTS(
-            event_id,
-            event_title,
-            event_description,
-            eventStartDate,
-            eventFinalDate,
-            event_status,
-            FK_ACCOUNT_ID
+            `INSERT INTO EVENTOS(
+            evento_id,
+            titulo_evento,
+            descricao_evento,
+            data_inicio_evento,
+            data_final_evento,
+            status_evento,
+            fk_id_conta
             ) VALUES (
-            SEQ_EVENTS.NEXTVAL,
-            :eventTitle,
-            :eventDescription,
-            :eventStart,
-            :eventFinal,
+            SEQ_EVENTOS.NEXTVAL,
+            :tituloEvento,
+            :descricaoEvento,
+            :dataInicioEvento,
+            :dataFinalEvento,
             'pendente',
-            :FK_ACCOUNT_ID
+            :fkIdConta
             )`,
             {
-                eventTitle: eventTitle,
-                eventDescription: eventDescription,
-                eventStart: eventStart,
-                eventFinal: eventFinal,
-                FK_ACCOUNT_ID: FK_ACCOUNT_ID
+                tituloEvento: tituloEvento,
+                descricaoEvento: descricaoEvento,
+                dataInicioEvento: dataInicioEvento,
+                dataFinalEvento: dataFinalEvento,
+                fkIdConta: fkIdConta
             }
         );
 
@@ -47,27 +46,27 @@ export namespace EventsHandler {
         await connection.close();
     }
 
-    export const addNewEventsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const eventTitle = req.get('event_title');
-        const eventDescription = req.get('event_description');
-        const eventStartDate = req.get('eventStartDate');
-        const eventFinalDate = req.get('eventFinalDate');
-        const pFK_ID = req.get('FK_ACCOUNT_ID');
+    export const adicionarNovoEventoHandler: RequestHandler = async (req: Request, res: Response) => {
+        const tituloEvento = req.get('titulo_evento');
+        const descricaoEvento = req.get('descricao_evento');
+        const dataInicioEvento = req.get('data_inicio_evento');
+        const dataFinalEvento = req.get('data_final_evento');
+        const fkIdConta = req.get('fk_id_conta');
 
         const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-        if (!eventStartDate || !eventFinalDate || !dateRegex.test(eventStartDate) || !dateRegex.test(eventFinalDate)) {
+        if (!dataInicioEvento || !dataFinalEvento || !dateRegex.test(dataInicioEvento) || !dateRegex.test(dataFinalEvento)) {
             res.status(400).send('Datas devem estar no formato dd/mm/yyyy.');
             return;
         }
-        if (eventTitle && eventDescription && eventStartDate && eventFinalDate && pFK_ID) {
-            await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, parseInt(pFK_ID));
+        if (tituloEvento && descricaoEvento && dataInicioEvento && dataFinalEvento && fkIdConta) {
+            await adicionarNovoEvento(tituloEvento, descricaoEvento, dataInicioEvento, dataFinalEvento, parseInt(fkIdConta));
             res.status(201).send('Evento Criado Com Sucesso. Aguarde a Aprovação.');
         } else {
             res.status(400).send('Parâmetros Faltando.');
         }
     };
 
-    async function deleteEvent(eventId: number) {
+    async function excluirEvento(eventoId: number) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -77,26 +76,26 @@ export namespace EventsHandler {
         });
 
         await connection.execute(
-            `UPDATE EVENTS SET event_status = 'excluído' WHERE EVENT_ID = :eventId`,
-            [eventId]
+            `UPDATE EVENTOS SET status_evento = 'excluído' WHERE evento_id = :eventoId`,
+            [eventoId]
         );
 
         await connection.commit();
         await connection.close();
     }
 
-    export const deleteEventHandler: RequestHandler = async (req: Request, res: Response) => {
-        const eventId = req.get('event_id');
-        if (eventId) {
-            const id = parseFloat(eventId);
-            await deleteEvent(id);
+    export const excluirEventoHandler: RequestHandler = async (req: Request, res: Response) => {
+        const eventoId = req.get('evento_id');
+        if (eventoId) {
+            const id = parseFloat(eventoId);
+            await excluirEvento(id);
             res.status(200).send('Evento Excluído Com Sucesso.');
         } else {
             res.status(400).send('Parâmetros Faltando.');
         }
     }
 
-    async function evaluateEvent(eventId: number, event_status: string, desc: string) {
+    async function avaliarEvento(eventoId: number, statusEvento: string, descricao: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection = await OracleDB.getConnection({
@@ -106,30 +105,29 @@ export namespace EventsHandler {
         });
 
         await connection.execute(
-            'UPDATE EVENTS SET event_status = :event_status WHERE event_id = :eventId',
-            [event_status, eventId],
+            'UPDATE EVENTOS SET status_evento = :statusEvento WHERE evento_id = :eventoId',
+            [statusEvento, eventoId],
             { autoCommit: true }
         );
 
-
         await connection.close();
     }
 
-    export const evaluateEventHandler: RequestHandler = async (req: Request, res: Response) => {
-        const eventId = req.get('event_id');
-        const eventStatus = req.get('event_status');
-        const textMessage = req.get('message');
+    export const avaliarEventoHandler: RequestHandler = async (req: Request, res: Response) => {
+        const eventoId = req.get('evento_id');
+        const statusEvento = req.get('status_evento');
+        const mensagem = req.get('mensagem');
 
-        if (eventId && eventStatus && textMessage) {
-            const id = parseInt(eventId);
-            await evaluateEvent(id, eventStatus, textMessage);
-            res.status(200).send(`Evento ${eventStatus}, ${textMessage}`);
+        if (eventoId && statusEvento && mensagem) {
+            const id = parseInt(eventoId);
+            await avaliarEvento(id, statusEvento, mensagem);
+            res.status(200).send(`Evento ${statusEvento}, ${mensagem}`);
         } else {
             res.status(400).send('Parâmetros Faltando.');
         }
     }
 
-    async function searchEvents(keyword: string) {
+    async function buscarEventos(palavraChave: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -140,24 +138,24 @@ export namespace EventsHandler {
         });
 
         let result = await connection.execute(
-            `SELECT * FROM EVENTS WHERE event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}%'`
+            `SELECT * FROM EVENTOS WHERE titulo_evento LIKE '%${palavraChave}%' OR descricao_evento LIKE '%${palavraChave}%'`
         );
 
         await connection.close();
         return result.rows;
     }
 
-    export const searchEventsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const keyword = req.get('keyword');
-        if (keyword) {
-            const events = await searchEvents(keyword);
-            res.status(200).send(events);
+    export const buscarEventosHandler: RequestHandler = async (req: Request, res: Response) => {
+        const palavraChave = req.get('palavra_chave');
+        if (palavraChave) {
+            const eventos = await buscarEventos(palavraChave);
+            res.status(200).send(eventos);
         } else {
             res.status(400).send('Parâmetros Faltando.');
         }
     };
 
-    async function getEvents(status_event: string) {
+    async function obterEventos(statusEvento: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -167,24 +165,24 @@ export namespace EventsHandler {
         });
 
         let result = await connection.execute(
-            `SELECT * FROM EVENTS WHERE event_status = '${status_event}'`
+            `SELECT * FROM EVENTOS WHERE status_evento = '${statusEvento}'`
         );
 
         await connection.close();
         return result.rows;
     }
 
-    export const getEventsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const status_event = req.get('status_event');
-        if (status_event) {
-            const events = await getEvents(status_event);
-            res.status(200).send(events);
+    export const obterEventosHandler: RequestHandler = async (req: Request, res: Response) => {
+        const statusEvento = req.get('status_evento');
+        if (statusEvento) {
+            const eventos = await obterEventos(statusEvento);
+            res.status(200).send(eventos);
         } else {
             res.status(400).send('Parâmetros Faltando.');
         }
     };
 
-    async function betOnEvents(event_id: number, email: string, bet_value: number, bet_option: string) {
+    async function apostarEmEventos(eventoId: number, email: string, valorAposta: number, opcaoAposta: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -194,31 +192,31 @@ export namespace EventsHandler {
         });
 
         await connection.execute(
-            `INSERT INTO BETS(
-            bet_id,
-            bet_value,
-            bet_option,
-            FK_ACCOUNT_EMAIL,
-            FK_EVENT_ID
+            `INSERT INTO APOSTAS(
+            aposta_id,
+            valor_aposta,
+            opcao_aposta,
+            fk_email_conta,
+            fk_id_evento
             ) VALUES (
-            SEQ_BETS.NEXTVAL,
-            :bet_value,
-            :bet_option,
+            SEQ_APOSTAS.NEXTVAL,
+            :valorAposta,
+            :opcaoAposta,
             :email,
-            :event_id    
+            :eventoId    
             )`,
             {
-                bet_value: bet_value,
-                bet_option: bet_option,
+                valorAposta: valorAposta,
+                opcaoAposta: opcaoAposta,
                 email: email,
-                event_id: event_id
+                eventoId: eventoId
             }
         );
 
         await connection.execute(
-            'UPDATE ACCOUNTS SET balance = balance - :bet_value WHERE email = :email',
+            'UPDATE CONTAS SET saldo = saldo - :valorAposta WHERE email = :email',
             {
-                bet_value: bet_value,
+                valorAposta: valorAposta,
                 email: email
             }
         );
@@ -227,7 +225,7 @@ export namespace EventsHandler {
         await connection.close();
     };
 
-    async function verifyAccount(email: string): Promise<boolean> {
+    async function verificarConta(email: string): Promise<boolean> {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -237,7 +235,7 @@ export namespace EventsHandler {
         });
 
         let result = await connection.execute(
-            `SELECT * FROM ACCOUNTS WHERE email = :email`,
+            `SELECT * FROM CONTAS WHERE email = :email`,
             [email]
         );
 
@@ -248,23 +246,23 @@ export namespace EventsHandler {
         }
     }
 
-    export const betOnEventsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const event_id = req.get('event_id');
-        const pemail = req.get('email');
-        const bet_value = req.get('bet_value');
-        const bet_option = req.get('bet_option');
+    export const apostarEmEventosHandler: RequestHandler = async (req: Request, res: Response) => {
+        const eventoId = req.get('evento_id');
+        const email = req.get('email');
+        const valorAposta = req.get('valor_aposta');
+        const opcaoAposta = req.get('opcao_aposta');
 
         // adicionar verificaçao se o evento esta com status de aprovado
 
-        if (event_id && pemail && bet_value && bet_option) {
-            if (parseFloat(bet_value) >= 1) {
-                if (await verifyAccount(pemail)) {
-                    const walletBalance = await FinancialManager.getWallet(pemail);
-                    if (walletBalance) {
-                        if (walletBalance < parseFloat(bet_value)) {
-                            res.status(400).send('Saldo Insuficiente .');
+        if (eventoId && email && valorAposta && opcaoAposta) {
+            if (parseFloat(valorAposta) >= 1) {
+                if (await verificarConta(email)) {
+                    const saldoCarteira = await Obtercarteira.obterCarteira(email);
+                    if (saldoCarteira) {
+                        if (saldoCarteira < parseFloat(valorAposta)) {
+                            res.status(400).send('Saldo Insuficiente.');
                         } else {
-                            await betOnEvents(parseInt(event_id), pemail, parseFloat(bet_value), bet_option);
+                            await apostarEmEventos(parseInt(eventoId), email, parseFloat(valorAposta), opcaoAposta);
                             res.status(201).send('Aposta Realizada Com Sucesso.');
                         }
                     } else {
@@ -281,7 +279,7 @@ export namespace EventsHandler {
         }
     };
 
-    async function finishEvent(event_id: number, event_verdict: string) {
+    async function finalizarEvento(eventoId: number, veredito: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -292,29 +290,29 @@ export namespace EventsHandler {
         });
 
         await connection.execute(
-            `UPDATE EVENTS SET event_status = 'finalizado' WHERE event_id = :event_id`,
-            [event_id]
+            `UPDATE EVENTOS SET status_evento = 'finalizado' WHERE evento_id = :eventoId`,
+            [eventoId]
         );
 
         await connection.execute(
-            `UPDATE EVENTS SET verdict = :event_verdict WHERE event_id = :event_id`,
-            [event_verdict, event_id]
+            `UPDATE EVENTOS SET veredito = :veredito WHERE evento_id = :eventoId`,
+            [veredito, eventoId]
         );
 
         await connection.execute(
-            `UPDATE EVENTS SET amount_wins = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option = :event_verdict) WHERE event_id = :event_id`,
-            { event_id: event_id, event_verdict: event_verdict }
+            `UPDATE EVENTOS SET valor_vitorias = (SELECT SUM(valor_aposta) FROM APOSTAS WHERE fk_id_evento = :eventoId AND opcao_aposta = :veredito) WHERE evento_id = :eventoId`,
+            { eventoId: eventoId, veredito: veredito }
         )
         await connection.execute(
-            `UPDATE EVENTS SET amount_loses = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option != :event_verdict) WHERE event_id = :event_id`,
-            { event_id: event_id, event_verdict: event_verdict }
+            `UPDATE EVENTOS SET valor_derrotas = (SELECT SUM(valor_aposta) FROM APOSTAS WHERE fk_id_evento = :eventoId AND opcao_aposta != :veredito) WHERE evento_id = :eventoId`,
+            { eventoId: eventoId, veredito: veredito }
         )
 
         await connection.commit();
         await connection.close();
     }
 
-    async function distributeValues(event_id: number, event_verdict: string) {
+    async function distribuirValores(eventoId: number, veredito: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -327,42 +325,42 @@ export namespace EventsHandler {
 
         // Obter todos os valores de aposta para os vencedores no evento específico
         const result = await connection.execute(
-            `SELECT BET_VALUE, FK_ACCOUNT_EMAIL 
-            FROM BETS 
-            WHERE FK_EVENT_ID = :event_id 
-            AND BET_OPTION = :user_option`,
-            { event_id: event_id, user_option: event_verdict }
+            `SELECT valor_aposta, fk_email_conta 
+            FROM APOSTAS 
+            WHERE fk_id_evento = :eventoId 
+            AND opcao_aposta = :userOption`,
+            { eventoId: eventoId, userOption: veredito }
         );
 
         if (result.rows && result.rows.length > 0) {
             // Calcular o prêmio para cada vencedor
             for (const row of result.rows) {
-                const result_amount_wins = await connection.execute(
-                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION = :event_verdict`,
-                    { event_id: event_id, event_verdict: event_verdict }
+                const resultValorVitorias = await connection.execute(
+                    `SELECT SUM(valor_aposta) AS TOTAL FROM APOSTAS WHERE fk_id_evento = :eventoId AND opcao_aposta = :veredito`,
+                    { eventoId: eventoId, veredito: veredito }
                 );
-                const result_amount_loses = await connection.execute(
-                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION != :event_verdict`,
-                    { event_id: event_id, event_verdict: event_verdict }
+                const resultValorDerrotas = await connection.execute(
+                    `SELECT SUM(valor_aposta) AS TOTAL FROM APOSTAS WHERE fk_id_evento = :eventoId AND opcao_aposta != :veredito`,
+                    { eventoId: eventoId, veredito: veredito }
                 );
-                if ((result_amount_wins.rows && result_amount_wins.rows.length > 0) && (result_amount_loses.rows && result_amount_loses.rows.length > 0)) {
-                    const amount_wins = (result_amount_wins.rows[0] as any).TOTAL;
-                    const amount_loses = (result_amount_loses.rows[0] as any).TOTAL;
+                if ((resultValorVitorias.rows && resultValorVitorias.rows.length > 0) && (resultValorDerrotas.rows && resultValorDerrotas.rows.length > 0)) {
+                    const valorVitorias = (resultValorVitorias.rows[0] as any).TOTAL;
+                    const valorDerrotas = (resultValorDerrotas.rows[0] as any).TOTAL;
 
                     if (typeof row === 'object' && row !== null) {
-                        let betValue = (row as any).BET_VALUE; // Valor da aposta de cada vencedor
-                        let email = (row as any).FK_ACCOUNT_EMAIL; // Email do usuário vencedor
+                        let valorAposta = (row as any).VALOR_APOSTA; // Valor da aposta de cada vencedor
+                        let email = (row as any).FK_EMAIL_CONTA; // Email do usuário vencedor
 
                         // Calcular a proporção e o prêmio individual
-                        var proportion = betValue / amount_wins;
-                        const prize = amount_loses * proportion;
+                        var proporcao = valorAposta / valorVitorias;
+                        const premio = valorDerrotas * proporcao;
 
                         // Atualizar o saldo do vencedor com o prêmio calculado
                         await connection.execute(
-                            `UPDATE ACCOUNTS 
-                        SET balance = balance + :prize + :betValue
+                            `UPDATE CONTAS 
+                        SET saldo = saldo + :premio + :valorAposta
                         WHERE email = :email`,
-                            { prize: prize, email: email, betValue: betValue }
+                            { premio: premio, email: email, valorAposta: valorAposta }
                         );
                     }
                 }
@@ -373,14 +371,14 @@ export namespace EventsHandler {
         }
     }
 
-    export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
-        const event_id = req.get('event_id');
-        const event_verdict = req.get('event_verdict');
+    export const finalizarEventoHandler: RequestHandler = async (req: Request, res: Response) => {
+        const eventoId = req.get('evento_id');
+        const veredito = req.get('veredito');
 
 
-        if (event_id && event_verdict) {
-            await finishEvent(parseInt(event_id), event_verdict);
-            await distributeValues(parseInt(event_id), event_verdict);
+        if (eventoId && veredito) {
+            await finalizarEvento(parseInt(eventoId), veredito);
+            await distribuirValores(parseInt(eventoId), veredito);
 
             res.status(200).send('Evento Finalizado Com Sucesso.');
         } else {
