@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Login</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="login-container">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" class="form-control" id="email" placeholder="Digite seu e-mail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Senha</label>
+                            <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    </form>
+                    <div id="loginMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();  // Impede o envio padrão do formulário
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Enviar os dados para o backend usando Fetch API
+            try {
+                const response = await fetch('http://localhost:3000/login', {  // Altere a URL conforme necessário
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })  // Envia os dados como JSON
+                });
+
+                const data = await response.json();
+
+                // Exibir a resposta no frontend
+                const messageDiv = document.getElementById('loginMessage');
+                if (data.success) {
+                    messageDiv.innerHTML = `<p class="text-success">${data.message}</p>`;
+                } else {
+                    messageDiv.innerHTML = `<p class="text-danger">${data.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                document.getElementById('loginMessage').innerHTML = `<p class="text-danger">Erro ao conectar com o servidor. Tente novamente mais tarde.</p>`;
+            }
+        });
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

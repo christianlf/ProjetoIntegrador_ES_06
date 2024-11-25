@@ -1,15 +1,14 @@
 import express from "express";
-import { Request, Response, Router } from "express";
+import cors from "cors";  // Importando o CORS
 import routes from "./routes";
 
-const port = 3000; 
+const port = 3000;
 const app = express();
 
+app.use(cors());  // Habilitando CORS para todas as rotas
 app.use(express.json()); // Para lidar com JSON no corpo da requisição
-app.use(routes);
+app.use(routes); // Rotas
 
-// Iniciar o servidor
 app.listen(port, () => {
     console.log(`Server is running on: ${port}`);
 });
-
