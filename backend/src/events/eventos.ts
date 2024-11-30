@@ -6,7 +6,31 @@ dotenv.config();
 
 export namespace ManipuladorDeEventos {
 
-    async function adicionarNovoEvento(tituloEvento: string, descricaoEvento: string, dataInicioEvento: string, dataFinalEvento: string, fkIdConta: number) {
+    async function getAccountByToken(token: string) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+
+        const result = await connection.execute(
+            'SELECT id, email, tipo_usuario FROM CONTAS WHERE token = :token',
+            [token]
+        );
+
+        var data: { ID: number, EMAIL: string, TIPO_USUARIO: string } | null = null;
+        if (result.rows && result.rows.length > 0) {
+            data = result.rows[0] as { ID: number, EMAIL: string, TIPO_USUARIO: string };
+            }
+
+        await connection.close();
+        return data;
+    }
+
+    async function adicionarNovoEvento(tituloEvento: string, descricaoEvento: string, dataInicioEvento: string, dataFinalEvento: string, fkIdConta: number, dataEvento: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -23,22 +47,25 @@ export namespace ManipuladorDeEventos {
             data_inicio_evento,
             data_final_evento,
             status_evento,
-            fk_id_conta
+            fk_id_conta,
+            data_evento
             ) VALUES (
             SEQ_EVENTOS.NEXTVAL,
             :tituloEvento,
             :descricaoEvento,
             :dataInicioEvento,
             :dataFinalEvento,
-            'pendente',
-            :fkIdConta
+            'aprovado',
+            :fkIdConta,
+            :dataEvento
             )`,
             {
                 tituloEvento: tituloEvento,
                 descricaoEvento: descricaoEvento,
                 dataInicioEvento: dataInicioEvento,
                 dataFinalEvento: dataFinalEvento,
-                fkIdConta: fkIdConta
+                fkIdConta: fkIdConta,
+                dataEvento: dataEvento
             }
         );
 
@@ -49,20 +76,29 @@ export namespace ManipuladorDeEventos {
     export const adicionarNovoEventoHandler: RequestHandler = async (req: Request, res: Response) => {
         const tituloEvento = req.get('titulo_evento');
         const descricaoEvento = req.get('descricao_evento');
+        const dataEvento = req.get('data_evento');
         const dataInicioEvento = req.get('data_inicio_evento');
         const dataFinalEvento = req.get('data_final_evento');
-        const fkIdConta = req.get('fk_id_conta');
+        const token = req.get('token');
 
-        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-        if (!dataInicioEvento || !dataFinalEvento || !dateRegex.test(dataInicioEvento) || !dateRegex.test(dataFinalEvento)) {
-            res.status(400).send('Datas devem estar no formato dd/mm/yyyy.');
+        if (!token) {
+            res.status(400).send('Token Faltando.');
             return;
         }
-        if (tituloEvento && descricaoEvento && dataInicioEvento && dataFinalEvento && fkIdConta) {
-            await adicionarNovoEvento(tituloEvento, descricaoEvento, dataInicioEvento, dataFinalEvento, parseInt(fkIdConta));
-            res.status(201).send('Evento Criado Com Sucesso. Aguarde a Aprovação.');
+
+        const conta = await getAccountByToken(token);
+        if (!conta) {
+            res.status(404).send('Conta não encontrada.');
+            return;
+        }
+
+        const fkIdConta : number = conta.ID;
+
+        if (tituloEvento && descricaoEvento && dataInicioEvento && dataFinalEvento && fkIdConta && dataEvento) {
+            await adicionarNovoEvento(tituloEvento, descricaoEvento, dataInicioEvento, dataFinalEvento, fkIdConta, dataEvento);
+            res.status(201).json({message: 'Evento Criado Com Sucesso. Aguarde a Aprovação.'});
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).send({message: 'Parâmetros Faltando.'});
         }
     };
 
@@ -86,6 +122,7 @@ export namespace ManipuladorDeEventos {
 
     export const excluirEventoHandler: RequestHandler = async (req: Request, res: Response) => {
         const eventoId = req.get('evento_id');
+
         if (eventoId) {
             const id = parseFloat(eventoId);
             await excluirEvento(id);
@@ -247,8 +284,20 @@ export namespace ManipuladorDeEventos {
     }
 
     export const apostarEmEventosHandler: RequestHandler = async (req: Request, res: Response) => {
-        const eventoId = req.get('evento_id');
-        const email = req.get('email');
+
+        const token = req.get('token');
+        if (!token) {
+            res.status(400).json({ message: 'Token Faltando.' });
+            return;
+        }
+        const conta = await getAccountByToken(token);
+        if (!conta) {
+            res.status(404).json({ message: 'Conta não encontrada.' });
+            return;
+        }
+
+        const email = conta.EMAIL;
+        const eventoId = req.get('evento_id')
         const valorAposta = req.get('valor_aposta');
         const opcaoAposta = req.get('opcao_aposta');
 
@@ -260,22 +309,22 @@ export namespace ManipuladorDeEventos {
                     const saldoCarteira = await Obtercarteira.obterCarteira(email);
                     if (saldoCarteira) {
                         if (saldoCarteira < parseFloat(valorAposta)) {
-                            res.status(400).send('Saldo Insuficiente.');
-                        } else {
+                            res.status(400).json({ message: 'Saldo Insuficiente.' });
+                        } else {    
                             await apostarEmEventos(parseInt(eventoId), email, parseFloat(valorAposta), opcaoAposta);
-                            res.status(201).send('Aposta Realizada Com Sucesso.');
+                            res.status(201).json({ message: 'Aposta Realizada Com Sucesso.' });
                         }
                     } else {
-                        res.status(400).send('Saldo não encontrado.');
+                        res.status(400).json({ message: 'Saldo não encontrado.' });
                     }
                 } else {
-                    res.status(404).send('Conta não encontrada.');
+                    res.status(404).json({ message: 'Conta não encontrada.' });
                 }
             } else {
-                res.status(400).send('Valor da Aposta Inválido. Por Favor, insira mais que R$1,00.');
+                res.status(400).json({ message: 'Valor da Aposta Inválido. Por Favor, insira mais que R$1,00.' });
             }
         } else {
-            res.send(400).send('Parâmetros Faltando.');
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     };
 
@@ -375,6 +424,17 @@ export namespace ManipuladorDeEventos {
         const eventoId = req.get('evento_id');
         const veredito = req.get('veredito');
 
+        const conta = await getAccountByToken(req.get('token') || '');
+        if (!conta) {
+            res.status(404).send('Conta não encontrada.');
+            return;
+        }
+
+        const tipo_usario = conta.TIPO_USUARIO;
+        if (tipo_usario !== 'ADMIN') {
+            res.status(401).send('Acesso Negado.');
+            return;
+        }
 
         if (eventoId && veredito) {
             await finalizarEvento(parseInt(eventoId), veredito);
@@ -383,6 +443,83 @@ export namespace ManipuladorDeEventos {
             res.status(200).send('Evento Finalizado Com Sucesso.');
         } else {
             res.status(400).send('Parâmetros Faltando.');
+        }
+    }
+
+    async function obterEventosCategoria(categoria: string) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        let result = await connection.execute(
+            `SELECT * FROM EVENTOS WHERE categoria = '${categoria}'`
+        );
+
+        await connection.close();
+        return result.rows;
+    }
+    
+    export const obterEventosCategoriaHandler: RequestHandler = async (req: Request, res: Response) => {
+        const categoria = req.get('categoria');
+        if (categoria) {
+            const eventos = await obterEventosCategoria(categoria);
+            res.status(200).json(eventos);
+        } else {
+            res.status(400).send('Parâmetros Faltando.');
+        }
+    }
+
+    async function obterEventosMaisApostados(){
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+        let result = await connection.execute(
+            `SELECT 
+                E.EVENTO_ID, 
+                E.TITULO_EVENTO, 
+                E.DESCRICAO_EVENTO,
+                E.DATA_INICIO_EVENTO,
+                E.DATA_FINAL_EVENTO,
+                E.DATA_EVENTO,
+                E.CATEGORIA,
+                COUNT(A.FK_ID_EVENTO) AS NUMERO_APOSTAS
+            FROM 
+                EVENTOS E
+            JOIN 
+                APOSTAS A
+            ON 
+                E.EVENTO_ID = A.FK_ID_EVENTO
+            WHERE 
+                E.STATUS_EVENTO = 'aprovado'
+            GROUP BY 
+                E.EVENTO_ID, 
+                E.TITULO_EVENTO, 
+                E.DESCRICAO_EVENTO,
+                E.DATA_INICIO_EVENTO,
+                E.DATA_FINAL_EVENTO,
+                E.DATA_EVENTO,
+                E.CATEGORIA
+            ORDER BY 
+                COUNT(A.FK_ID_EVENTO) DESC`
+        );
+        await connection.close();
+        return result.rows;
+    }
+
+    export const obterEventosMaisApostadosHandler: RequestHandler = async (req: Request, res: Response) => {
+        const data = await obterEventosMaisApostados();
+        if (data) {
+            res.status(200).json(data);
+        } else {
+            res.status(400).send('Erro ao buscar eventos.');
         }
     }
 }

@@ -1,0 +1,178 @@
+/* Reset básico */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body, h1, h2, p, div, section, header, footer, form, input, select, button, table, th, td {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Configurações gerais */
+body {
+    font-family: 'Roboto', sans-serif; /* Aplicando a fonte Roboto */
+    background-color: #1b1f3a; /* Azul-escuro */
+    color: #ffffff; /* Texto branco */
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #1b1f3a; /* Azul-escuro */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); /* Sombra escura */
+    border-bottom: 2px solid #ff6f3c; /* Barra inferior laranja */
+}
+
+.navbar .navbar-brand {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #ff6f3c; /* Texto laranja */
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar .navbar-brand i {
+    margin-right: 8px; /* Espaço entre o ícone e o texto */
+    font-size: 1.5rem;
+    color: #ff6f3c; /* Ícone na cor laranja */
+    transition: transform 0.2s ease;
+}
+
+.navbar .navbar-brand:hover i {
+    transform: translateX(-4px); /* Animação de deslocamento ao passar o mouse */
+}
+
+.navbar .navbar-brand:hover {
+    color: #ffffff; /* Branco ao passar o mouse */
+    text-decoration: underline; /* Subtítulo sutil */
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header h1 {
+    color: #ff6f3c; /* Laranja */
+    font-weight: bold;
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    background-color: #272b4a; /* Azul-escuro mais claro */
+    color: #ffffff;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff6f3c; /* Laranja */
+}
+
+.card-body {
+    padding: 20px;
+    background-color: #272b4a; /* Fundo do corpo */
+}
+
+/* Inputs e Botões */
+.input-group .form-control,
+.input-group-text {
+    border-radius: 0;
+    background-color: #f4f4f9; /* Cinza-claro */
+    border: 1px solid #ff6f3c; /* Borda laranja */
+    color: #1b1f3a; /* Texto escuro */
+}
+
+.input-group .btn {
+    border-radius: 0;
+    background-color: #ff6f3c; /* Botão laranja */
+    color: #ffffff; /* Texto branco */
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #ff6f3c; /* Laranja */
+    border: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #ffffff; /* Branco */
+    color: #1b1f3a; /* Texto escuro */
+}
+
+/* Tabelas */
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+    color: #ffffff; /* Texto branco */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #272b4a; /* Azul-escuro mais claro */
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #ff6f3c; /* Bordas laranja */
+}
+
+/* Alertas */
+.alert-info {
+    background-color: #272b4a; /* Azul-escuro mais claro */
+    color: #ff6f3c; /* Laranja */
+    border: 1px solid #ff6f3c;
+}
+
+/* Estilos para formulário de saque */
+#dados-pix,
+#dados-conta {
+    display: none;
+}
+
+#dados-pix.active,
+#dados-conta.active {
+    display: block;
+}
+
+/* Rodapé */
+footer {
+    font-size: 0.9rem;
+    background-color: #1b1f3a; /* Azul-escuro */
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Tabelas */
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+    color: #333; /* Texto escuro para contraste */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #3c4357; /* Azul-escuro mais claro para linhas alternadas */
+}
+
+/* Alterando a cor de fundo das linhas */
+.table thead {
+    background-color: #ff6f3c; /* Laranja para o cabeçalho */
+    color: #ffffff; /* Texto branco no cabeçalho */
+}
+
+/* Alertas */
+.alert-info {
+    background-color: #272b4a; /* Azul-escuro mais claro */
+    color: #ff6f3c; /* Laranja */
+    border: 1px solid #ff6f3c;
+}

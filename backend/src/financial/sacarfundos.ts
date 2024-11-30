@@ -6,6 +6,30 @@ import { Obtercarteira } from "../financial/Obtercarteira";
 dotenv.config();
 
 export namespace SacarFundos {
+
+    async function getAccountByToken(token: string) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+
+        const result = await connection.execute(
+            'SELECT id, email, tipo_usuario FROM CONTAS WHERE token = :token',
+            [token]
+        );
+
+        var data: { ID: number, EMAIL: string, TIPO_USUARIO: string } | null = null;
+        if (result.rows && result.rows.length > 0) {
+            data = result.rows[0] as { ID: number, EMAIL: string, TIPO_USUARIO: string };
+        }
+
+        await connection.close();
+        return data;
+    }
     
     async function sacarFundos(ownerEmail: string, saque: number) {
 
@@ -36,33 +60,39 @@ export namespace SacarFundos {
     }
 
     export const gerenciadorSacarFundos: RequestHandler = async (req: Request, res: Response) => {
-        const pEmail = req.get('email');
-        const pSaque = req.get('saque');
-
-        if (pEmail && pSaque) {
-            var saque = parseFloat(pSaque);
-            const saldo = await Obtercarteira.obterCarteira(pEmail);
-
-            if (saldo) {
-                if (saque > saldo) {
-                    res.status(400).send('Saldo insuficiente para realizar o saque');
+        const token = req.get('token');
+        if (token){
+            const account = await getAccountByToken(token);
+            if (account) {
+                const email = account.EMAIL;
+                const saque = req.get('saque');
+                if (email && saque) {
+                    const saqueNumber = parseFloat(saque);
+                    const saldo = await Obtercarteira.obterCarteira(email);
+                    if (saldo) {
+                        if (saqueNumber > saldo) {
+                            res.status(400).json({ message: 'Saldo insuficiente para realizar o saque' });
+                            return;
+                        }
+                    } else {
+                        res.status(400).json({ message: 'Saldo não encontrado para o email: ' + email });
+                        return;
+                    }
+                    if (saqueNumber > 101000) {
+                        res.status(400).json({ message: 'Quantia de saque excedeu o limite diário' });
+                        return;
+                    }
+                    if (saqueNumber > 0 && await sacarFundos(email, saqueNumber)) {
+                        res.status(200).json({ message: 'Saque concluído com sucesso!' });
+                    } else {
+                        res.status(400).json({ message: 'Quantia de saque inválida ou email não encontrado' });
+                    }
+                } else {
+                    res.status(400).json({ message: 'Email ou quantia de saque não fornecidos' });
                 }
             } else {
-                res.status(400).send('Saldo não encontrado para o email: ' + pEmail);
+                res.status(400).json({ message: 'Conta não encontrada' });
             }
-
-            if (saque > 101000) {
-                res.status(400).send('Quantia de saque excedeu o limite diário');
-            };
-
-            if (saque > 0 && await sacarFundos(pEmail, saque)) {
-                res.status(200).send(`Saque concluído com sucesso!`);
-            } else {
-                res.status(400).send('Quantia de saque inválida ou email não encontrado');
-            }
-        }
-        else {
-            res.status(400).send('Email ou quantia de saque não fornecidos');
         }
     }
 }

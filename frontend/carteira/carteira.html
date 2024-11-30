@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Carteira</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="carteira.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <nav class="navbar ">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../homepage/homepage.html">
+                <i class="bi bi-arrow-left"></i> Voltar ao Início
+            </a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <header class="text-center my-4">
+                    <h1 class="display-6">Minha Carteira</h1>
+                </header>
+            </div>
+        </div>
+
+        <div class="wallet-container">
+            <div class="row">
+                <section id="saldo" class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h2 class="card-title">Saldo Atual</h2>
+                            <p id="valor-saldo" class="display-6 text-primary">R$ 0,00</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="compra-creditos" class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title mb-3">Comprar Créditos</h2>
+                            <form id="form-compra-creditos">
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" id="valor-compra" min="0" step="0.01"
+                                        placeholder="Valor para comprar">
+                                    <button type="submit" class="btn btn-primary">Comprar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="historico-compras" class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title mb-3">Histórico de Compra de Créditos</h2>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-compras">
+                                        <!-- Linhas de compras serão adicionadas dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="historico-apostas" class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title mb-3">Histórico de Uso de Créditos</h2>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Valor</th>
+                                            <th>Resultado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-apostas">
+                                        <!-- Linhas de apostas serão adicionadas dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="saque" class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title mb-3">Sacar Saldo</h2>
+                            <p class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Valor máximo de saque por dia: R$ 101.000,00
+                            </p>
+
+                            <form id="form-saque">
+                                <div class="mb-3">
+                                    <label for="metodo-saque" class="form-label">Método de Saque:</label>
+                                    <select id="metodo-saque" name="metodo-saque" class="form-select">
+                                        <option value="default">Selecione um Metodo </option>
+                                        <option value="pix">Chave PIX</option>
+                                        <option value="conta-bancaria">Conta Bancária</option>
+                                    </select>
+                                </div>
+
+                                <div id="dados-pix" class="mb-3">
+                                    <label for="chave-pix" class="form-label">Chave PIX:</label>
+                                    <input type="text" class="form-control" id="chave-pix" name="chave-pix">
+                                </div>
+
+                                <div id="dados-conta" style="display: none;" class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="banco" class="form-label">Banco:</label>
+                                            <input type="text" class="form-control" id="banco" name="banco">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="agencia" class="form-label">Agência:</label>
+                                            <input type="text" class="form-control" id="agencia" name="agencia">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="conta" class="form-label">Número da Conta:</label>
+                                            <input type="text" class="form-control" id="conta" name="conta">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="valor-saque" class="form-label">Valor do Saque:</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="valor-saque" name="valor-saque"
+                                            min="0" max="101000" step="0.01">
+                                    </div>
+                                </div>
+
+                                <div id="taxas-saque" class="mb-3">
+                                    <h3 class="h5 mb-3">Tabela de Taxas de Saque</h3>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Valor do Saque</th>
+                                                    <th>Taxa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Até R$ 500,00</td>
+                                                    <td>Isento</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>De R$ 500,01 a R$ 5.000,00</td>
+                                                    <td>R$ 5,00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>De R$ 5.000,01 a R$ 20.000,00</td>
+                                                    <td>R$ 10,00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Acima de R$ 20.000,01</td>
+                                                    <td>R$ 20,00</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-cash-stack me-2"></i>Solicitar Saque
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function Deposito(fundos) {
+            const token = localStorage.getItem('token');
+
+            const h = new Headers();
+            h.append('token', token);
+            h.append('funds', fundos);
+
+            try {
+                const response = await fetch('http://localhost:3000/AdicionarFundos', {
+                    method: 'POST',
+                    headers: h,
+                });
+                if (response.ok) {
+                    alert('Depósito realizado com sucesso!');
+                }
+                else {
+                    alert('Erro ao realizar depósito');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        document.getElementById('form-compra-creditos').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Previne o comportamento padrão do formulário
+
+            const fundos = document.getElementById('valor-compra').value;
+            if (fundos && fundos > 0 && fundos <= 99999999.99) {
+                await Deposito(fundos);
+            } else {
+                alert('Insira um valor válido para o depósito.');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const listaCompras = document.getElementById('lista-compras');
+            const compras = [
+
+            ];
+
+            compras.forEach(compra => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${compra.data}</td><td>${compra.valor}</td>`;
+                listaCompras.appendChild(tr);
+            });
+
+            const listaApostas = document.getElementById('lista-apostas');
+            const apostas = [
+            ];
+
+            apostas.forEach(aposta => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td>${aposta.data}</td>
+            <td>${aposta.valor}</td>
+            <td>${aposta.tipo}</td>
+            <td>${aposta.resultado}</td>
+        `;
+                listaApostas.appendChild(tr);
+            });
+        });
+
+        document.getElementById('form-saque').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const metodo = document.getElementById('metodo-saque').value;
+            const valor = document.getElementById('valor-saque').value;
+
+            let dados = { metodo, valor };
+
+            if (metodo === 'pix') {
+                const chavePix = document.getElementById('chave-pix').value;
+                if (!chavePix) {
+                    alert('Por favor, insira uma chave PIX válida.');
+                    return;
+                }
+                dados.chavePix = chavePix;
+            } else if (metodo === 'conta-bancaria') {
+                const banco = document.getElementById('banco').value;
+                const agencia = document.getElementById('agencia').value;
+                const conta = document.getElementById('conta').value;
+                if (!banco || !agencia || !conta) {
+                    alert('Por favor, preencha todos os campos da conta bancária.');
+                    return;
+                }
+                dados.banco = banco;
+                dados.agencia = agencia;
+                dados.conta = conta;
+            }
+
+            await sacar();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const saldoElement = document.getElementById('valor-saldo');
+            const withdrawalMethodSelect = document.getElementById('metodo-saque');
+            const pixDataContainer = document.getElementById('dados-pix');
+            const bankDataContainer = document.getElementById('dados-conta');
+
+            withdrawalMethodSelect.addEventListener('change', function () {
+                // Check the selected value
+                if (this.value === 'pix') {
+                    pixDataContainer.style.display = 'block';
+                    bankDataContainer.style.display = 'none';
+                } else if (this.value === 'conta-bancaria') {
+                    // Show bank details, hide PIX input
+                    pixDataContainer.style.display = 'none';
+                    bankDataContainer.style.display = 'block';
+                }
+            });
+        });
+
+        async function sacar() {
+            const token = localStorage.getItem('token');
+            const saque = document.getElementById('valor-saque').value;
+            const h = new Headers();
+            h.append('token', token);
+            h.append('saque', saque);
+            try {
+                const response = await fetch('http://localhost:3000/sacarFundos', {
+                    method: 'POST',
+                    headers: h,
+                });
+                if (response.ok) {
+                    data = await response.json();
+                    alert(data.message);
+                }
+                else {
+                    data = await response.json();
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        async function obterCarteira() {
+            const token = localStorage.getItem('token');
+            const h = new Headers();
+            h.append('token', token);
+            try {
+                const response = await fetch('http://localhost:3000/obterCarteira', {
+                    method: 'GET',
+                    headers: h,
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('valor-saldo').innerText = `R$ ${data.saldo}`;
+                }
+                else {
+                    alert('Erro ao obter carteira');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        async function obterTransacao()
+        {
+            const token = localStorage.getItem('token');
+            const transacao = 'DEPOSITO';
+
+            const h = new Headers();
+            h.append('token', token);
+            h.append('transacao', transacao);
+
+            try{
+                const response = await fetch('http://localhost:3000/obterTransacao', {
+                    method: 'GET',
+                    headers: h,
+                });
+                if(response.ok)
+                {
+                    const data = await response.json();
+                    const listaCompras = document.getElementById('lista-compras');
+                    data.forEach(compra => {
+                        const tr = document.createElement('tr');
+                        const dataTransacao = new Date(compra.DATA_TRANSACAO).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+                        tr.innerHTML = `<td>${dataTransacao}</td><td>${compra.VALOR}</td>`;
+                        listaCompras.appendChild(tr);
+                    });
+                }
+                else
+                {
+                    alert('Erro ao obter transações');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+
+            }
+        }
+
+        window.onload = () => {
+            obterCarteira();
+            obterTransacao();
+        }
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

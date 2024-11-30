@@ -28,7 +28,7 @@ export namespace gerenciadorCadastro {
         const pEmail = req.get('email');
         const pPassword = req.get('senha');
         const pBirthday_date = req.get('data_nascimento');
-
+        
         if (pName && pEmail && pPassword && pBirthday_date) {
             let connection = await OracleDB.getConnection({
                 user: process.env.ORACLE_USER,
@@ -42,16 +42,16 @@ export namespace gerenciadorCadastro {
             );
 
             if (result.rows && result.rows.length > 0) {
-                res.status(400).send('Usuário já cadastrado.');
+                res.status(400).json({ message: 'Usuário já cadastrado.' });
             } else {
                 await cadastro(pName, pEmail, pPassword, pBirthday_date);
-                res.status(200).send('Usuário cadastrado com sucesso.');
+                res.status(200).json({ message: 'Usuário cadastrado com sucesso.' });
             }
 
             await connection.close();
 
         } else {
-            res.status(400).send('Requisição inválida - Parâmetros faltando.');
+            res.status(400).json({ message: 'Requisição inválida - Parâmetros faltando.' });
         }
     };
 }

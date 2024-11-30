@@ -28,13 +28,19 @@ export namespace gerenciadorLogin {
             const pEmail = req.get('email');
             const pSenha = req.get('senha');
 
-            if (pEmail && pSenha) {
-                const isLoggedIn = await login(pEmail, pSenha);
 
-                if (isLoggedIn) {
-                    res.status(200).send('Login realizado com sucesso.');
+            if (pEmail && pSenha) {
+                
+                const credenciaisValidas = await validateCredentials(pEmail, pSenha);
+                if (credenciaisValidas) {
+                    const token = await login(pEmail, pSenha);
+                    if(token) {
+                        res.status(200).json({message: 'Login realizado com sucesso.', token: token});
+                    } else{
+                        res.status(500).json({message: 'Erro ao gerar token.'});
+                    }
                 } else {
-                    res.status(401).send('Credenciais inválidas. Acesso negado.');
+                    res.status(401).json({message: 'Credenciais inválidas. Acesso negado.'});
                 }
             } else {
                 res.status(400).send('Requisição inválida - Parâmetros faltando.');
@@ -55,8 +61,22 @@ export namespace gerenciadorLogin {
             [email, senha],
             { autoCommit: true }
         );
+        
+        const result = await connection.execute(
+            'SELECT token FROM CONTAS WHERE email = :email AND senha = :senha',
+            [email, senha]
+        );
 
-        return await validateCredentials(email, senha);
+        var token = null;
+
+        if (result.rows && result.rows.length > 0) {
+            token = (result.rows[0] as { TOKEN: string }).TOKEN; 
+           console.log(result.rows[0]);
+        }
+
+        await connection.close();
+        return token;
     }
 
 }
+

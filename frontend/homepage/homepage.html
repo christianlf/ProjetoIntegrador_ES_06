@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Eventos e Apostas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="homepage.css">
+    <style>
+        .category-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: scale(1.05);
+        }
+
+        .event-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <div class="container">
+                <a class="navbar-brand" href="#">Plataforma de Apostas</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="homepage.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../carteira/carteira.html">Carteira</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Busca Principal -->
+        <div class="container mb-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <form class="d-flex" onsubmit="buscarEventos(event)">
+                        <input class="form-control me-2" type="search" id="keyword"
+                            placeholder="Busque eventos por palavra-chave" aria-label="Buscar">
+                        <button class="btn btn-primary me-2" type="submit">Buscar</button>
+                        <button class="btn btn-primary me-2" type="button" data-bs-toggle="modal"
+                            data-bs-target="#createEventModal">Criar Evento</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <!-- Seção de Eventos em Destaque -->
+            <div class="row mb-4" id="featured-events-section" style="display:none;">
+                <div class="col-12">
+                    <h2>Eventos em Destaque</h2>
+                    <div id="featured-events-container" class="row">
+                        <!-- Eventos em destaque serão carregados aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultados da Busca -->
+            <div class="row mb-4" id="search-results-section" style="display:none;">
+                <div class="col-12">
+                    <h2>Resultados da Busca</h2>
+                    <div id="search-events-container" class="row">
+                        <!-- Eventos buscados serão carregados aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Criar Evento-->
+            <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-black" id="createEventModalLabel">Criar Evento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="createEventForm" onsubmit="criarEvento(event)">
+                                <div class="form-group">
+                                    <label for="eventName">Nome do Evento</label>
+                                    <input type="text" class="form-control" id="eventName"
+                                        placeholder="Digite o nome do evento" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventStartDate">Data Início das Apostas</label>
+                                    <input type="date" class="form-control" id="eventStartDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventEndDate">Data Encerramento das Apostas</label>
+                                    <input type="date" class="form-control" id="eventEndDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventDate">Data do Evento</label>
+                                    <input type="date" class="form-control" id="eventDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventDescription">Descrição</label>
+                                    <textarea class="form-control" id="eventDescription"
+                                        placeholder="Descrição do evento" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 mt-3">Criar Evento</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destaques e Categorias -->
+            <!-- Categorias de Eventos -->
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h3>Categorias de Eventos</h3>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card category-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Olimpíadas</h5>
+                            <p class="card-text">Eventos esportivos internacionais</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card category-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Catástrofes</h5>
+                            <p class="card-text">Eventos naturais e de impacto global</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card category-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Eleições</h5>
+                            <p class="card-text">Processos eleitorais nacionais</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card category-card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Bolsa de Valores</h5>
+                            <p class="card-text">Tendências do mercado financeiro</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </section>
+
+            <!-- Seção de Eventos por Categoria -->
+            <section class="events-by-category container">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h2 class="text-center">Eventos Disponíveis por Categoria</h2>
+                    </div>
+                    <div id="events-by-category-container" class="col-12">
+                        <!-- Categorias e eventos serão carregados dinamicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <div class="Events">
+                <h1 class="text-center">Eventos Disponíveis</h1>
+                <div id="events-container" class="row mt-4">
+                    <!-- Eventos serão carregados dinamicamente -->
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="betModal" tabindex="-1" aria-labelledby="betModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="betModalLabel">Realizar Aposta</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="betForm">
+                            <div class="form-group mb-3">
+                                <label for="betEventTitle">Evento</label>
+                                <input type="text" class="form-control" id="betEventTitle" readonly>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="betChoice">Escolha</label>
+                                <select class="form-select" id="betChoice" required>
+                                    <option value="" disabled selected>Selecione sua escolha</option>
+                                    <option value="sim">Sim</option>
+                                    <option value="nao">Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="betValue">Valor da Aposta</label>
+                                <input type="number" class="form-control" id="betValue"
+                                    placeholder="Digite o valor da aposta" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Confirmar Aposta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer style="padding-top: 30px;">
+        <!-- Adicione conteúdo do rodapé aqui, se necessário -->
+    </footer>
+    <!-- Bootstrap JS e Dependências -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        async function buscarEventos() {
+
+            const keyword = document.getElementById('keyword').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/searchEvents', {
+                    method: 'GET',
+                    headers: { 'palavra_chave': keyword }
+                });
+
+                if (response.ok) {
+                    const eventos = await response.json();
+                    const container = document.getElementById('events-container');
+                    container.innerHTML = ''; // Limpa o container antes de renderizar
+
+                    eventos.forEach(evento => {
+                        const eventCard = `
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${evento.TITULO_EVENTO}</h5>
+                                    <p class="card-text">Descrição: ${evento.DESCRICAO_EVENTO}</p>
+                                    <p class="card-text">Data de Início: ${evento.DATA_INICIO_EVENTO}</p>
+                                    <p class="card-text">Data de Encerramento: ${evento.DATA_FINAL_EVENTO}</p>
+                                    <p class="card-text">Data do Evento: ${evento.DATA_EVENTO}</p>
+                                    <p class="card-text">Categoria: ${evento.CATEGORIA}</p> 
+                                    <p class="card-text">id: ${evento.EVENTO_ID}</p>
+                                    <a href="#"
+                                    id="apostarBtn"
+                                    class="btn btn-outline-primary"
+                                    data-event-id="${evento.EVENTO_ID}">APOSTAR</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                        container.innerHTML += eventCard;
+                    });
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar eventos:', error);
+                alert('Ocorreu um erro ao buscar eventos. Por favor, tente novamente.');
+            }
+        }
+
+
+
+
+
+
+
+
+        const betModal = new bootstrap.Modal(document.getElementById('betModal'));
+        const betEventTitle = document.getElementById('betEventTitle');
+        const betForm = document.getElementById('betForm');
+
+        // Evento de clique no botão "Apostar"
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'apostarBtn') {
+                const card = e.target.closest('.card');
+                const eventTitle = card.querySelector('.card-title').innerText;
+                const eventId = e.target.getAttribute('data-event-id'); // Recupera o ID do evento
+                // Preenche os campos do modal
+                betEventTitle.value = eventTitle;
+                betForm.setAttribute('data-event-id', eventId); // Armazena o ID no formulário ou em um atributo
+                betModal.show();
+            }
+        });
+
+
+        betForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            criarAposta()
+            betModal.hide();
+            betForm.reset();
+        });
+
+
+        // Implemente a lógica de realizar a aposta
+        async function criarAposta() {
+            let escolha = document.getElementById('betChoice').value;
+            escolha = escolha.toLowerCase();
+            const valor = document.getElementById('betValue').value;
+            const token = localStorage.getItem('token');
+            const eventoId = betForm.getAttribute('data-event-id');
+
+            try {
+                const h = new Headers();
+                h.append('opcao_aposta', escolha);
+                h.append('valor_aposta', valor);
+                h.append('token', token);
+                h.append('evento_id', eventoId);
+
+                const response = await fetch('http://localhost:3000/criarAposta', {
+                    method: 'PUT',
+                    headers: h
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    window.location.href = '../homepage/homepage.html';
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao criar a aposta. Por favor, tente novamente.');
+            }
+        }
+
+        async function carregarEventos() {
+            try {
+                const response = await fetch(
+                    'http://localhost:3000/getEvents', // Altere a URL conforme necessário
+                    {
+                        method: 'GET',
+                        headers: { 'status_evento': 'aprovado' }
+                    }
+                )
+                const eventos = await response.json();
+
+                const container = document.getElementById('events-container');
+                container.innerHTML = ''; // Limpa o container antes de renderizar
+
+                eventos.forEach(evento => {
+                    const eventCard = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${evento.TITULO_EVENTO}</h5>
+                                <p class="card-text">Descrição: ${evento.DESCRICAO_EVENTO}</p>
+                                <p class="card-text">Data de Início: ${evento.DATA_INICIO_EVENTO}</p>
+                                <p class="card-text">Data de Encerramento: ${evento.DATA_FINAL_EVENTO}</p>
+                                <p class="card-text">Data do Evento: ${evento.DATA_EVENTO}</p>
+                                <p class="card-text">Categoria: ${evento.CATEGORIA}</p>
+                                <p class="card-text">id: ${evento.EVENTO_ID}</p>
+                                <a href="#" 
+                                id="apostarBtn" 
+                                class="btn btn-outline-primary" 
+                                data-event-id="${evento.EVENTO_ID}">APOSTAR</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    container.innerHTML += eventCard;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar eventos:', error);
+            }
+        }
+        carregarEventos();
+
+        async function criarEvento(event) {
+            event.preventDefault();
+
+            const eventName = document.getElementById('eventName').value;
+            const eventStartDate = document.getElementById('eventStartDate').value;
+            const eventEndDate = document.getElementById('eventEndDate').value;
+            const eventDate = document.getElementById('eventDate').value;
+            const eventDescription = document.getElementById('eventDescription').value;
+            try {
+                const h = new Headers();
+                h.append('titulo_evento', eventName);
+                h.append('data_inicio_evento', eventStartDate);
+                h.append('data_final_evento', eventEndDate);
+                h.append('descricao_evento', eventDescription);
+                h.append('data_evento', eventDate);
+                h.append('token', localStorage.getItem('token'));
+
+                console.log(Date);
+                const response = await fetch('http://localhost:3000/criarEvento', {
+                    method: 'PUT',
+                    headers: h
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    window.location.href = '../homepage/homepage.html';
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao criar o evento. Por favor, tente novamente.');
+            }
+        }
+
+        async function buscarEventos(event) {
+            if (event) event.preventDefault();
+
+            const keyword = document.getElementById('keyword').value;
+            const searchContainer = document.getElementById('search-events-container');
+            const searchSection = document.getElementById('search-results-section');
+
+            // Clear previous search results immediately
+            searchContainer.innerHTML = '';
+            searchSection.style.display = 'none';
+
+            // Check if keyword is empty
+            if (!keyword.trim()) {
+                alert('Por favor, insira uma palavra-chave para busca.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/searchEvents', {
+                    method: 'GET',
+                    headers: { 'palavra_chave': keyword }
+                });
+
+                if (response.ok) {
+                    const eventos = await response.json();
+
+                    if (eventos.length > 0) {
+                        eventos.forEach(evento => {
+                            const eventCard = `
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${evento.TITULO_EVENTO}</h5>
+                                    <p class="card-text">Descrição: ${evento.DESCRICAO_EVENTO}</p>
+                                    <p class="card-text">Data de Início: ${evento.DATA_INICIO_EVENTO}</p>
+                                    <p class="card-text">Data de Encerramento: ${evento.DATA_FINAL_EVENTO}</p>
+                                    <p class="card-text">Data do Evento: ${evento.DATA_EVENTO}</p>
+                                    <p class="card-text">Categoria: ${evento.CATEGORIA}</p> 
+                                    <p class="card-text">id: ${evento.EVENTO_ID}</p>
+                                    <a href="#"
+                                    id="apostarBtn"
+                                    class="btn btn-outline-primary"
+                                    data-event-id="${evento.EVENTO_ID}">APOSTAR</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                            searchContainer.innerHTML += eventCard;
+                        });
+                        searchSection.style.display = 'block';
+                    } else {
+                        // No events found
+                        searchSection.style.display = 'none';
+                        alert('Nenhum evento encontrado para esta busca.');
+                    }
+                } else {
+                    // Handle error response
+                    const errorData = await response.json();
+                    alert(errorData.message);
+
+                    // Ensure everything is cleared in case of error
+                    searchContainer.innerHTML = '';
+                    searchSection.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar eventos:', error);
+                alert('Ocorreu um erro ao buscar eventos. Por favor, tente novamente.');
+
+                // Ensure everything is cleared in case of error
+                searchContainer.innerHTML = '';
+                searchSection.style.display = 'none';
+            }
+        }
+
+        // Função para carregar eventos em destaque
+        async function carregarEventosDestaque() {
+            try {
+                const response = await fetch(
+                    'http://localhost:3000/obterEventosAposta',
+                    {
+                        method: 'GET',
+                    }
+                );
+                const eventos = await response.json();
+
+                const featuredContainer = document.getElementById('featured-events-container');
+                const featuredSection = document.getElementById('featured-events-section');
+                featuredContainer.innerHTML = ''; // Limpa o container antes de renderizar
+
+                if (eventos.length > 0) {
+                    eventos.slice(0, 3).forEach(evento => {
+                        const eventCard = `
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${evento.TITULO_EVENTO}</h5>
+                                    <p class="card-text">Descrição: ${evento.DESCRICAO_EVENTO}</p>
+                                    <p class="card-text">Data do Evento: ${evento.DATA_EVENTO}</p>
+                                    <p class="card-text">Categoria: ${evento.CATEGORIA}</p>
+                                    <p class="card-text">Numero Apostas : ${evento.NUMERO_APOSTAS}</p>
+                                    <a href="#" 
+                                    id="apostarBtn" 
+                                    class="btn btn-outline-primary" 
+                                    data-event-id="${evento.EVENTO_ID}">APOSTAR</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                        featuredContainer.innerHTML += eventCard;
+                    });
+                    featuredSection.style.display = 'block';
+                } else {
+                    featuredSection.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar eventos em destaque:', error);
+            }
+        }
+
+        // Função para carregar todos os eventos
+        async function carregarEventos() {
+            try {
+                const response = await fetch(
+                    'http://localhost:3000/getEvents',
+                    {
+                        method: 'GET',
+                        headers: { 'status_evento': 'aprovado' }
+                    }
+                )
+                const eventos = await response.json();
+
+                const container = document.getElementById('events-container');
+                container.innerHTML = ''; // Limpa o container antes de renderizar
+
+                eventos.forEach(evento => {
+                    const eventCard = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${evento.TITULO_EVENTO}</h5>
+                                <p class="card-text">Descrição: ${evento.DESCRICAO_EVENTO}</p>
+                                <p class="card-text">Data de Início: ${evento.DATA_INICIO_EVENTO}</p>
+                                <p class="card-text">Data de Encerramento: ${evento.DATA_FINAL_EVENTO}</p>
+                                <p class="card-text">Data do Evento: ${evento.DATA_EVENTO}</p>
+                                <p class="card-text">Categoria: ${evento.CATEGORIA}</p>
+                                <p class="card-text">id: ${evento.EVENTO_ID}</p>
+                                <a href="#" 
+                                id="apostarBtn" 
+                                class="btn btn-outline-primary" 
+                                data-event-id="${evento.EVENTO_ID}">APOSTAR</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    container.innerHTML += eventCard;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar eventos:', error);
+            }
+        }
+
+        // Chamar as funções quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarEventosDestaque();
+            carregarEventos();
+        });
+
+        async function obterEventosPorCategoria(categoria) {
+            try {
+                const response = await fetch('http://localhost:3000/obterCategoria', {
+                    method: 'GET',
+                    headers: { 'categoria': categoria }
+                });
+
+                if (response.ok) {
+                    const eventos = await response.json();
+                    const container = document.getElementById('events-container');
+                    const categoryTitle = document.querySelector('.Events h1');
+
+                    // Limpa o container antes de renderizar
+                    container.innerHTML = '';
+
+                    // Atualiza o título para mostrar a categoria
+                    categoryTitle.textContent = `Eventos de ${categoria}`;
+
+                    if (eventos.length > 0) {
+                        eventos.forEach(evento => {
+                            const eventCard = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${evento.TITULO_EVENTO}</h5>
+                                <p class="card-text">Descrição: ${evento.DESCRICAO_EVENTO}</p>
+                                <p class="card-text">Data de Início: ${evento.DATA_INICIO_EVENTO}</p>
+                                <p class="card-text">Data de Encerramento: ${evento.DATA_FINAL_EVENTO}</p>
+                                <p class="card-text">Data do Evento: ${evento.DATA_EVENTO}</p>
+                                <p class="card-text">Categoria: ${evento.CATEGORIA}</p>
+                                <p class="card-text">ID: ${evento.EVENTO_ID}</p>
+                                <a href="#" 
+                                id="apostarBtn" 
+                                class="btn btn-outline-primary" 
+                                data-event-id="${evento.EVENTO_ID}">APOSTAR</a>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                            container.innerHTML += eventCard;
+                        });
+                    } else {
+                        container.innerHTML = `
+                        <div class="col-12">
+                        <div class="alert alert-info text-center" role="alert">
+                            Nenhum evento encontrado na categoria ${categoria}.
+                        </div>
+                    </div>
+                `;
+                    }
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message);
+                }
+            } catch (error) {
+                console.error(`Erro ao buscar eventos da categoria ${categoria}:`, error);
+                alert('Ocorreu um erro ao buscar eventos. Por favor, tente novamente.');
+            }
+        }
+
+        // Adiciona event listeners aos cards de categoria
+        document.addEventListener('DOMContentLoaded', () => {
+            const categoryCards = document.querySelectorAll('.category-card');
+
+            categoryCards.forEach(card => {
+                card.addEventListener('click', (event) => {
+                    // Previne a navegação para outra página
+                    event.preventDefault();
+
+                    // Obtém o texto do título da categoria
+                    const categoryTitle = card.querySelector('.card-title').textContent;
+
+                    // Chama a função para obter eventos por categoria
+                    obterEventosPorCategoria(categoryTitle);
+                });
+            });
+        });
+
+
+
+        // Modify the DOMContentLoaded event listener to include the new function
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarEventosDestaque();
+            carregarEventos(); // Keep the original events display
+            carregarEventosPorCategoria(); // Add the new category-based events display
+        });
+    </script>
+
+
+
+</body>
+
+</html>

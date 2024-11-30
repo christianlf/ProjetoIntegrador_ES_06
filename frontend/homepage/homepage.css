@@ -1,0 +1,246 @@
+/* Fontes e Reset Básico */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body, h1, h2, h3, p, a, div, section, footer {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Configurações Gerais */
+body {
+    background-color: #1b1f3a; /* Azul-escuro */
+    color: #ffffff; /* Branco */
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #1b1f3a !important; /* Azul-escuro */
+    border-bottom: 2px solid #ff6f3c; /* Laranja */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.navbar .navbar-brand {
+    font-weight: bold;
+    color: #ff6f3c !important; /* Laranja */
+    text-transform: uppercase;
+    font-size: 1.3rem;
+}
+
+.navbar .nav-link {
+    color: #ffffff !important; /* Branco */
+    font-weight: 500;
+    text-transform: capitalize;
+    transition: color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+    color: #ff6f3c !important; /* Laranja */
+}
+
+.navbar-toggler {
+    border: none;
+    background-color: transparent;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='white' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+    filter: brightness(1.2);
+}
+
+/* Busca Principal */
+form.d-flex input {
+    border-radius: 4px;
+    border: 1px solid #f4f4f9;
+    background-color: #f4f4f9; /* Cinza-claro */
+    color: #1b1f3a; /* Azul-escuro */
+}
+
+form.d-flex input::placeholder {
+    color: #aaaaaa; /* Placeholder mais claro */
+}
+
+form.d-flex .btn {
+    background-color: #ff6f3c; /* Laranja */
+    color: #ffffff; /* Branco */
+    border: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+form.d-flex .btn:hover {
+    background-color: #ffffff; /* Branco */
+    color: #1b1f3a; /* Azul-escuro */
+}
+
+/* Destaques */
+.card {
+    border: none;
+    border-radius: 8px;
+    background-color: #272b4a; /* Azul-escuro mais claro */
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.card-title {
+    font-weight: bold;
+    color: #ff6f3c; /* Laranja */
+}
+
+.card-text {
+    color: #dddddd; /* Cinza claro */
+}
+
+.card .btn-outline-primary {
+    color: #ff6f3c; /* Laranja */
+    border-color: #ff6f3c;
+    transition: all 0.3s ease;
+}
+
+.card .btn-outline-primary:hover {
+    background-color: #ff6f3c;
+    color: #ffffff; /* Branco */
+}
+
+
+/* Estilo geral do modal */
+.modal-content {
+    border-radius: 8px;
+    background-color: #f9f9f9; /* Cor de fundo suave */
+    border: none;
+    padding: 20px;
+}
+
+/* Cabeçalho do modal */
+.modal-header {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* Título do modal */
+.modal-title {
+    color: #333; /* Cor escura para o título */
+    font-weight: bold;
+}
+
+/* Fechar o botão do modal */
+.btn-close {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+/* Corpo do modal */
+.modal-body {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Formulário */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Labels dos campos */
+.form-group label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555; /* Cor de texto suave */
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Campos de input */
+.form-control {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+}
+
+/* Input quando está em foco */
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Botão de criação de evento */
+.btn-success {
+    background-color: #ff6f3c; /* Cor verde */
+    border-color: #ff6f3c;
+    color: white;
+    font-size: 1.1rem;
+    padding: 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* Botão ao passar o mouse */
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Ajuste de espaçamento entre os campos */
+input[type="date"], textarea {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/* Categorias */
+.category-card {
+    border: 1px solid #ff6f3c; /* Laranja */
+    border-radius: 8px;
+    background-color: #1b1f3a; /* Azul-escuro */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(255, 111, 60, 0.4); /* Sombras laranjas */
+}
+
+.category-card .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #ff6f3c;
+}
+
+.category-card .card-text {
+    color: #dddddd;
+}
+
+/* Rodapé */
+footer {
+    background-color: #272b4a; /* Azul escuro mais claro */
+    color: #ffffff;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Botão Adicional */
+.btn-aposta {
+    background-color: #ff6f3c;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-aposta:hover {
+    background-color: #ffffff;
+    color: #1b1f3a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
