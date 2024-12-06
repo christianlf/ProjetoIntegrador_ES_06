@@ -48,12 +48,76 @@
                         <div class="card-body">
                             <h2 class="card-title mb-3">Comprar Créditos</h2>
                             <form id="form-compra-creditos">
-                                <div class="input-group">
-                                    <span class="input-group-text">R$</span>
-                                    <input type="number" class="form-control" id="valor-compra" min="0" step="0.01"
-                                        placeholder="Valor para comprar">
-                                    <button type="submit" class="btn btn-primary">Comprar</button>
+                                <div class="mb-3">
+                                    <label for="valor-compra" class="form-label">Valor para comprar</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="valor-compra" min="0" step="0.01"
+                                            placeholder="Valor para comprar" required>
+                                    </div>
                                 </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Método de Pagamento</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="metodoPagamento" id="pix"
+                                            value="pix" required>
+                                        <label class="form-check-label" for="pix">
+                                            Pix
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="metodoPagamento"
+                                            id="transferencia" value="transferencia">
+                                        <label class="form-check-label" for="transferencia">
+                                            Transferência Bancária
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="pix-details" class="mb-3" style="display:none;">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Detalhes do Pix</h5>
+                                            <div class="mb-3">
+                                                <label for="chave-pix" class="form-label">Chave Pix</label>
+                                                <input type="text" class="form-control" id="chave-pix"
+                                                    placeholder="Digite sua chave Pix">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="transferencia-details" class="mb-3" style="display:none;">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Detalhes da Transferência</h5>
+                                            <div class="mb-3">
+                                                <label for="banco" class="form-label">Banco</label>
+                                                <select class="form-select" id="banco">
+                                                    <option value="">Selecione o Banco</option>
+                                                    <option value="banco1">Banco do Brasil</option>
+                                                    <option value="banco2">Itaú</option>
+                                                    <option value="banco3">Bradesco</option>
+                                                    <option value="banco4">Santander</option>
+                                                    <option value="banco5">Caixa Econômica</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="agencia" class="form-label">Agência</label>
+                                                <input type="text" class="form-control" id="agencia"
+                                                    placeholder="Número da Agência">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="conta" class="form-label">Conta</label>
+                                                <input type="text" class="form-control" id="conta"
+                                                    placeholder="Número da Conta">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Comprar</button>
                             </form>
                         </div>
                     </div>
@@ -355,8 +419,7 @@
             }
         }
 
-        async function obterTransacao()
-        {
+        async function obterTransacao() {
             const token = localStorage.getItem('token');
             const transacao = 'DEPOSITO';
 
@@ -364,13 +427,12 @@
             h.append('token', token);
             h.append('transacao', transacao);
 
-            try{
+            try {
                 const response = await fetch('http://localhost:3000/obterTransacao', {
                     method: 'GET',
                     headers: h,
                 });
-                if(response.ok)
-                {
+                if (response.ok) {
                     const data = await response.json();
                     const listaCompras = document.getElementById('lista-compras');
                     data.forEach(compra => {
@@ -380,8 +442,7 @@
                         listaCompras.appendChild(tr);
                     });
                 }
-                else
-                {
+                else {
                     alert('Erro ao obter transações');
                 }
             } catch (error) {
@@ -389,6 +450,21 @@
 
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const pixRadio = document.getElementById('pix');
+            const transferenciaRadio = document.getElementById('transferencia');
+            const pixDetails = document.getElementById('pix-details');
+            const transferenciaDetails = document.getElementById('transferencia-details');
+
+            function showPaymentDetails() {
+                pixDetails.style.display = pixRadio.checked ? 'block' : 'none';
+                transferenciaDetails.style.display = transferenciaRadio.checked ? 'block' : 'none';
+            }
+
+            pixRadio.addEventListener('change', showPaymentDetails);
+            transferenciaRadio.addEventListener('change', showPaymentDetails);
+        });
 
         window.onload = () => {
             obterCarteira();

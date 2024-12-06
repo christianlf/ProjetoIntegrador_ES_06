@@ -28,5 +28,6 @@ routes.put('/criarEvento', ManipuladorDeEventos.adicionarNovoEventoHandler);
 routes.get('/obterTransacao', gerenciadorTransacao.obterTransacaoHandler);
 routes.get('/obterCategoria', ManipuladorDeEventos.obterEventosCategoriaHandler);
 routes.get('/obterEventosAposta', ManipuladorDeEventos.obterEventosMaisApostadosHandler);
+routes.get('/obterEventosConta', ManipuladorDeEventos.obterEventosContaHandler);
 
 export default routes;

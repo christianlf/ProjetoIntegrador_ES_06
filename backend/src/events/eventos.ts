@@ -522,4 +522,43 @@ export namespace ManipuladorDeEventos {
             res.status(400).send('Erro ao buscar eventos.');
         }
     }
+
+    async function obterEventosConta(id: number) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        let result = await connection.execute(
+            `SELECT * FROM EVENTOS WHERE fk_id_conta = :id`,
+            [id]
+        );
+
+        await connection.close();
+        return result.rows;
+    }
+
+    export const obterEventosContaHandler: RequestHandler = async (req: Request, res: Response) => {
+        const token = req.get('token');
+        if (!token) {
+            res.status(400).json({ message: 'Token Faltando.' });
+            return;
+        }
+        const conta = await getAccountByToken(token);
+        if (!conta) {
+            res.status(404).json({ message: 'Conta não encontrada.' });
+            return;
+        }
+        const id = conta.ID;
+
+        if (id) {
+            const eventos = await obterEventosConta(id);
+            res.status(200).json(eventos);
+        } else {
+            res.status(400).json({ message: ' Parâmetros Faltando.'});
+        }
+    }
 }
